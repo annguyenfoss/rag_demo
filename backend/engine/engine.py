@@ -1,6 +1,7 @@
-r"""RAG engine wiring for LlamaIndex, Ollama, and Milvus (Lite).
+r"""RAG engine wiring for LlamaIndex and Milvus (Lite).
 
-All lines are wrapped at 79 characters to comply with PEP 8.
+Delegates LLM/embedding configuration to provider-specific modules under this
+package (OpenAI or Ollama), based on config.DEPLOYMENT_MODE.
 """
 from __future__ import annotations
 
@@ -16,13 +17,14 @@ from llama_index.core import (
 )
 from llama_index.core.schema import Document
 from llama_index.core.readers import SimpleDirectoryReader
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from llama_index.core.vector_stores.types import (
     ExactMatchFilter,
     MetadataFilters,
 )
+
+from .ollama import configure_ollama_settings
+from .openai import configure_openai_settings
 
 import config
 
@@ -39,31 +41,13 @@ def _storage_exists(path_str: str) -> bool:
 def init_settings() -> None:
     """Initialize global LlamaIndex settings for LLM and embeddings."""
     logger.info("=== Initializing LlamaIndex settings ===")
-    logger.info(f"Setting up Ollama LLM: {config.OLLAMA_MODEL}")
-    logger.info(f"Ollama base URL: {config.OLLAMA_BASE_URL}")
+    mode = getattr(config, "DEPLOYMENT_MODE", "gpu")
+    logger.info(f"Deployment mode: {mode}")
 
-    Settings.llm = Ollama(
-        model=config.OLLAMA_MODEL,
-        base_url=config.OLLAMA_BASE_URL,
-        request_timeout=600.0,
-        system_prompt=(
-            "You are a helpful assistant. Format ALL responses using proper markdown:\n"
-            "- Use **bold** for vehicle names, key terms, and important specifications\n"
-            "- Use ## headings to organize different sections (e.g., ## Engine Options, ## Dimensions)\n"
-            "- Use bullet points (-) for lists of features, specifications, or options\n"
-            "- Break content into clear, readable paragraphs with line breaks between topics\n"
-            "- For measurements, use format: **Label**: value (e.g., **Length**: 5,155 mm)\n\n"
-            "Always structure information clearly and use markdown formatting consistently."
-        ),
-    )
-
-    logger.info(f"Setting up Ollama embeddings: {config.EMBED_MODEL}")
-    Settings.embed_model = OllamaEmbedding(
-        model_name=config.EMBED_MODEL,
-        base_url=config.OLLAMA_BASE_URL,
-        request_timeout=600.0,
-    )
-    logger.info("LlamaIndex settings initialized successfully (with markdown formatting)")
+    if mode == "gpu":
+        configure_ollama_settings()
+    else:
+        configure_openai_settings()
 
 
 def _build_vector_store() -> MilvusVectorStore:
@@ -252,4 +236,5 @@ def ingest_from_data_dir() -> int:
 
     logger.info(f"=== Ingestion complete: {len(documents)} documents ===")
     return len(documents)
+
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 
-from engine import ingest_from_data_dir, init_settings
+from engine.engine import ingest_from_data_dir, init_settings
 
 logger = logging.getLogger(__name__)
 

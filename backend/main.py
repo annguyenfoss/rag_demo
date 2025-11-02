@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import config
-from engine import get_query_engine, init_settings, get_llm
+from engine.engine import get_query_engine, init_settings, get_llm
 from llama_index.core.vector_stores.types import (
     ExactMatchFilter,
     MetadataFilters,

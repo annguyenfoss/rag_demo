@@ -5,6 +5,7 @@ All constants are kept under 79 characters per PEP 8.
 from pathlib import Path
 import logging
 import os
+from dotenv import load_dotenv
 
 # Setup logging
 logging.basicConfig(
@@ -16,9 +17,20 @@ logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parent
 
+# Load environment variables from a local .env if present
+load_dotenv()
+
+DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "gpu").lower()
+
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:30b")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+OPENAI_EMBED_MODEL = os.getenv(
+    "OPENAI_EMBED_MODEL", "text-embedding-3-large"
+)
 
 MILVUS_URI = os.getenv("MILVUS_URI", str(ROOT_DIR / "milvus.db"))
 MILVUS_COLLECTION = os.getenv("MILVUS_COLLECTION", "rag_collection")
@@ -33,9 +45,12 @@ ALLOWED_ORIGINS = os.getenv(
 
 logger.info("=== Configuration loaded ===")
 logger.info(f"ROOT_DIR: {ROOT_DIR}")
+logger.info(f"DEPLOYMENT_MODE: {DEPLOYMENT_MODE}")
 logger.info(f"OLLAMA_BASE_URL: {OLLAMA_BASE_URL}")
 logger.info(f"OLLAMA_MODEL: {OLLAMA_MODEL}")
 logger.info(f"EMBED_MODEL: {EMBED_MODEL}")
+logger.info(f"OPENAI_MODEL: {OPENAI_MODEL}")
+logger.info(f"OPENAI_EMBED_MODEL: {OPENAI_EMBED_MODEL}")
 logger.info(f"MILVUS_URI: {MILVUS_URI}")
 logger.info(f"MILVUS_COLLECTION: {MILVUS_COLLECTION}")
 logger.info(f"STORAGE_DIR: {STORAGE_DIR}")

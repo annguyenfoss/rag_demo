@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 import json
 
-from engine import init_settings, get_query_engine, _load_or_create_index
+from engine.engine import init_settings, get_query_engine, _load_or_create_index
 import config
 
 logging.basicConfig(level=logging.INFO)

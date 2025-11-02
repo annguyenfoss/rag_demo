@@ -61,14 +61,10 @@ All configuration is optional with sensible defaults. To customize:
 
 1. Copy the example environment file:
    ```bash
-   # For backend configuration
    cp backend/.env.example backend/.env
-   
-   # Or use the root-level example
-   cp .env.example .env
    ```
 
-2. Edit `.env` with your custom values (see `.env.example` for all options)
+2. Edit `backend/.env` with your custom values (see `backend/.env.example` for all options)
 
 **Available Environment Variables:**
 
@@ -77,11 +73,11 @@ All configuration is optional with sensible defaults. To customize:
 - `EMBED_MODEL` (default `nomic-embed-text`)
 - `MILVUS_URI` (default `milvus.db` for Milvus Lite)
 - `MILVUS_COLLECTION` (default `rag_collection`)
-- `STORAGE_DIR` (default `backend/storage`)
-- `DATA_DIR` (default `backend/data`)
+- `STORAGE_DIR` (default `storage` relative to backend directory)
+- `DATA_DIR` (default `data` relative to backend directory)
 - `ALLOWED_ORIGINS` (default `http://localhost:9200,http://127.0.0.1:9200`)
 
-**Note:** `.env` files are excluded from git (see `.gitignore`). Only `.env.example` files are tracked.
+**Note:** `.env` files are excluded from git (see `.gitignore`). Only `.env.example` files are tracked. Backend configuration uses `backend/.env.example`, and frontend has its own `frontend/.env.example` for Vite-specific settings.
 
 ## Notes
 
