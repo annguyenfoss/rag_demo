@@ -205,6 +205,12 @@ async def chat(req: ChatRequest) -> ChatResponse:
             f"DEBUG: Retrieved {len(response.source_nodes)} "
             f"source documents"
         )
+        # If no sources survived postprocessing, return concise not-found
+        if len(response.source_nodes) == 0:
+            text = _not_found_message(req.message, car_model)
+            logger.info("No sources after similarity cutoff; returning not-found")
+            return ChatResponse(answer=text)
+
         for i, node in enumerate(response.source_nodes[:3], 1):
             metadata = (
                 node.node.metadata

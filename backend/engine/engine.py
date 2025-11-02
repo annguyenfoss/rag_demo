@@ -22,6 +22,7 @@ from llama_index.core.vector_stores.types import (
     ExactMatchFilter,
     MetadataFilters,
 )
+from llama_index.core.postprocessor import SimilarityPostprocessor
 
 from .ollama import configure_ollama_settings
 from .openai import configure_openai_settings
@@ -31,11 +32,58 @@ import config
 logger = logging.getLogger(__name__)
 
 _QUERY_ENGINE = None  # type: ignore[var-annotated]
+_SIMILARITY_CUTOFF = 0.2
 
 
 def _storage_exists(path_str: str) -> bool:
     path = Path(path_str)
     return path.exists() and any(path.iterdir())
+
+
+def _resolve_embedding_dim() -> int:
+    """Return embedding dimension for the configured embed model.
+
+    Milvus requires a dimension when creating a new collection. We derive a
+    sensible default based on the selected embedding model.
+    """
+    mode = getattr(config, "DEPLOYMENT_MODE", "gpu")
+    if mode == "wrapper":
+        name = (getattr(config, "OPENAI_EMBED_MODEL", "") or "").lower()
+        # Common OpenAI embedding dimensions
+        if "text-embedding-3-large" in name:
+            return 3072
+        if "text-embedding-3-small" in name:
+            return 1536
+        if "text-embedding-ada-002" in name:
+            return 1536
+        # Default fallback for unknown OpenAI embedding models
+        logger.warning(
+            "Unknown OpenAI embedding model '%s'; defaulting dim=1536", name
+        )
+        return 1536
+
+    # GPU (Ollama) mode
+    name = (getattr(config, "EMBED_MODEL", "") or "").lower()
+    # Common local embedding model dimensions
+    if "nomic-embed-text" in name:
+        return 768
+    if "bge-large" in name:
+        return 1024
+    if "bge-base" in name:
+        return 768
+    if "bge-small" in name:
+        return 384
+    if "gte-large" in name:
+        return 1024
+    if "gte-base" in name:
+        return 768
+    if "gte-small" in name:
+        return 384
+    # Conservative default for unknown local models
+    logger.warning(
+        "Unknown local embedding model '%s'; defaulting dim=768", name
+    )
+    return 768
 
 
 def init_settings() -> None:
@@ -53,9 +101,12 @@ def init_settings() -> None:
 def _build_vector_store() -> MilvusVectorStore:
     logger.info(f"Building Milvus vector store at {config.MILVUS_URI}")
     logger.info(f"Collection name: {config.MILVUS_COLLECTION}")
+    dim = _resolve_embedding_dim()
+    logger.info(f"Using embedding dimension for Milvus collection: {dim}")
     return MilvusVectorStore(
         uri=config.MILVUS_URI,
         collection_name=config.MILVUS_COLLECTION,
+        dim=dim,
         overwrite=False,
     )
 
@@ -64,7 +115,7 @@ def _load_or_create_index() -> VectorStoreIndex:
     logger.info("=== Loading or creating vector index ===")
     vector_store = _build_vector_store()
     storage_context = StorageContext.from_defaults(
-        vector_store=vector_store, persist_dir=config.STORAGE_DIR
+        vector_store=vector_store
     )
 
     if _storage_exists(config.STORAGE_DIR):
@@ -99,6 +150,9 @@ def get_query_engine(filters: MetadataFilters | None = None):
             _QUERY_ENGINE = index.as_query_engine(
                 similarity_top_k=5,
                 streaming=False,
+                node_postprocessors=[
+                    SimilarityPostprocessor(similarity_cutoff=_SIMILARITY_CUTOFF)
+                ],
             )
             logger.info("Query engine initialized (similarity_top_k=5)")
         return _QUERY_ENGINE
@@ -108,6 +162,9 @@ def get_query_engine(filters: MetadataFilters | None = None):
     return index.as_query_engine(
         similarity_top_k=5,
         streaming=False,
+        node_postprocessors=[
+            SimilarityPostprocessor(similarity_cutoff=_SIMILARITY_CUTOFF)
+        ],
         filters=filters,
     )
 
@@ -217,7 +274,7 @@ def ingest_from_data_dir() -> int:
     logger.info("Building vector index from documents...")
     vector_store = _build_vector_store()
     storage_context = StorageContext.from_defaults(
-        vector_store=vector_store, persist_dir=config.STORAGE_DIR
+        vector_store=vector_store
     )
 
     logger.info("Creating embeddings (this may take a while)...")
