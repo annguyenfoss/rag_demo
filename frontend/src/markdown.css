@@ -1,0 +1,90 @@
+/* Markdown styling for chat messages */
+.markdownContent {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #1d1d1f;
+}
+
+.markdownContent p {
+  margin: 0 0 12px 0;
+}
+
+.markdownContent p:last-child {
+  margin-bottom: 0;
+}
+
+.markdownContent strong {
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.markdownContent ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.markdownContent ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.markdownContent li {
+  margin-bottom: 6px;
+}
+
+.markdownContent li:last-child {
+  margin-bottom: 0;
+}
+
+.markdownContent code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 16px;
+  color: #d73a49;
+}
+
+.markdownContent pre {
+  background: #f5f5f7;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #e5e5e7;
+}
+
+.markdownContent pre code {
+  background: none;
+  padding: 0;
+  color: #1d1d1f;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.markdownContent h1 {
+  font-size: 24px;
+}
+
+.markdownContent h2 {
+  font-size: 22px;
+}
+
+.markdownContent h3 {
+  font-size: 20px;
+}
+
+.markdownContent blockquote {
+  border-left: 3px solid #007AFF;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #515154;
+}
+

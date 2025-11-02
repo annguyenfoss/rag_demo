@@ -1,0 +1,117 @@
+# Python - Backend dependencies and cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Python - Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.Python
+
+# Python - Cache and temp files
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+*.log
+*.pot
+*.pyc
+*.pyd
+*.pyo
+
+# Configuration files (but allow .env.example files)
+.env
+.env.local
+.env.*.local
+config.local.*
+*.local.json
+*.secret.*
+
+# Allow example configuration files to be committed
+!.env.example
+!**/.env.example
+
+# LlamaIndex storage and Milvus Lite
+backend/storage/
+backend/milvus.db
+milvus.db
+storage/
+*.db
+*.db.lock
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.lock
+
+# Node - Frontend dependencies
+node_modules/
+frontend/node_modules/
+jspm_packages/
+
+# Node - Build and cache
+dist/
+.vite/
+.cache/
+.parcel-cache/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Node - Logs and temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+.~*
+*.orig
+
+# System and runtime
+*.pid
+*.seed
+*.pid.lock
